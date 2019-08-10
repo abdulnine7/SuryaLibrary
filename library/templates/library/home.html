@@ -1,18 +1,26 @@
-{% extends "blog/base.html" %}
+{% extends "library/base.html" %}
+{% load humanize %}
 {% block content %}
-    <h1 class="mb-3">Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h1>
-    {% for post in posts %}
-        <article class="media content-section">
-          <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
-              <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+    {% for book in books %}
+    <div class="card card-body mb-2" style="box-shadow: 1px 1px 1px 1px grey;">
+        <div class="article-metadata">
+          <h5><a class="article-titleeeeeeeeeee" href="{% url 'book-detail' book.id %}">{{ book.title }}</a></h5>
+        </div>
+        <p class="article-content">{{ book.description | cut:"" | truncatechars_html:120 }}</p>
+        <div class="">
+            <div class="row">
+              <div class="col-md-4 pb-2">
+                Author: <strong>{{ book.author }}</strong>
+              </div>
+              <div class="col-md-4 pb-2">
+                Available: <strong>{{ book.available_copies }}</strong>
+              </div>
+              <div class="col-md-4 pb-2">
+                Publisher: <strong>{{ book.publisher }}</strong>
+              </div>
             </div>
-            <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content }}</p>
-          </div>
-        </article>
+        </div>
+  </div>
     {% endfor %}
     {% if is_paginated %}
 
