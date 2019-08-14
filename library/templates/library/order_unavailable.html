@@ -1,0 +1,24 @@
+{% extends "library/base.html" %}
+{% block content %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata mb-4">
+      <h3>Sorry:</h3>
+    </div>
+    <div class="my-4" style="text-align:center;">
+      The book you requested <strong>'{{ book.title }}'</strong> in not currently available in stock.
+      <br>
+      Please check back in a week.
+    </div>
+    <div class="row pb-3">
+      <div class="col-md-4"> </div>
+      <div class="col-md-4">
+      <form method="GET" action="{% url 'library-home' %}">
+        <input class="btn btn-primary" type="submit" style="width:100%;" value="Check other Books">
+      </form>
+      </div>
+      <div class="col-md-4"> </div>
+    </div>
+  </div>
+</article>
+{% endblock content %}

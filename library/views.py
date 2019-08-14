@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import (
     ListView,
     DetailView,
@@ -6,7 +6,9 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Book
+from django.contrib import messages
+from .models import Book, Delivery, Review
+from .forms import OrderBookForm
 
 def home(request):
     context = {
@@ -24,5 +26,50 @@ class BookListView(ListView):
 class BookDetailView(DetailView):
     model = Book
 
+    def get_reviews(self):
+        book = get_object_or_404(Book, id=self.kwargs.get('pk'))
+        return Review.objects.filter(book = book)
+
 def about(request):
     return render(request, 'library/about.html', {'title': 'About'})
+
+def orderBook(request):
+    if (request.method == 'GET'):
+        form = OrderBookForm(request.GET)
+        if form.is_valid():
+            book_id = form.cleaned_data['book_id']
+            #Received booking request with book id now first check if available_copies
+            book = get_object_or_404(Book, id = book_id)
+            delivery = request.user.profile.area.day
+
+            #print("##" + delivery + "##" + book.title)
+            if book.available_copies > 0: #means available
+                context = {
+                    'book' : book,
+                    'delivery' : delivery
+                }
+                return render(request, 'library/order_confirm.html', context)
+
+            else: #means not available.
+                context = {
+                    'book' : book,
+                }
+                return render(request, 'library/order_unavailable.html', context)
+
+def orderConfirmBook(request):
+    if (request.method == 'GET'):
+        form = OrderBookForm(request.GET)
+        if form.is_valid():
+            book_id = form.cleaned_data['book_id']
+            #Add to users notification and delivery shedule list
+            delivery = Delivery.objects.create(book = get_object_or_404(Book, id = book_id), user = request.user, area = request.user.profile.area)
+            delivery.save()
+
+            messages.success(request, 'Your book has been added to our delivery schedule! We will get it to you soon!')
+            return render(request, 'library/home.html')
+        else:
+            messages.warning(request, 'Something is wrong! Please try again later!')
+            return render(request, 'library/home.html')
+    else:
+        messages.warning(request, 'Something is wrong! Please try again later!')
+        return render(request, 'library/home.html')

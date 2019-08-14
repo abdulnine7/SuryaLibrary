@@ -1,0 +1,26 @@
+{% extends "library/base.html" %}
+{% block content %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata mb-4">
+      <h3>Confirmation:</h3>
+    </div>
+    <div class="my-4" style="text-align:center;">
+      Confirm order for book <strong>'{{ book.title }}'</strong> ?
+      <br>
+      Tentative Delivery : <strong>{{ delivery }}</strong>
+    </div>
+    <div class="row pb-3">
+      <div class="col-md-4"> </div>
+      <div class="col-md-4">
+      <form method="GET" action="{% url 'confirm-order-book' %}">
+
+        <input type="hidden" name="book_id" value="{{ book.id }}">
+        <input class="btn btn-primary" type="submit" style="width:100%;" value="Confirm">
+      </form>
+      </div>
+      <div class="col-md-4"> </div>
+    </div>
+  </div>
+</article>
+{% endblock content %}

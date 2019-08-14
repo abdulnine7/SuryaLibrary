@@ -1,82 +1,109 @@
 {% extends "library/base.html" %}
+{% load my_filters %}
 {% block content %}
-  <article class="media content-section">
-    <div class="media-body">
-      <div class="article-metadata mb-4">
-        <h3>Book Details:</h3>
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata mb-4">
+      <h3>Book Details:</h3>
+    </div>
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Name :</strong>
       </div>
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Name :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.title }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Author :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.author }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Description :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.description }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Publisher :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.publisher }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Language :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.language }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>ISBN No :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.isbn_no }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>Available :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.available_copies }}
-          </div>
-        </div>
-
-        <div class="row pb-3" style="font-size: 17px">
-          <div class="col-md-4">
-            <strong>No. of Pages :</strong>
-          </div>
-          <div class="col-md-8">
-            {{ object.pages }}
-          </div>
-        </div>
-
+      <div class="col-md-8">
+        {{ object.title }}
       </div>
-  </article>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Author :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.author }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Description :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.description }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Publisher :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.publisher }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Language :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.language }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>ISBN No :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.isbn_no }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>Available :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.available_copies }} / {{ book.total_copies }}
+      </div>
+    </div>
+
+    <div class="row pb-3" style="font-size: 17px">
+      <div class="col-md-4">
+        <strong>No. of Pages :</strong>
+      </div>
+      <div class="col-md-8">
+        {{ object.pages }}
+      </div>
+    </div>
+
+    <div class="row pb-3">
+      <div class="col-md-4"> </div>
+      <div class="col-md-4">
+      <form method="GET" action="{% url 'order-book' %}">
+
+        <input type="hidden" name="book_id" value="{{ object.id }}">
+        <input class="btn btn-primary" type="submit" style="width:100%;" value="Order Now">
+      </form>
+      </div>
+      <div class="col-md-4"> </div>
+    </div>
+  </div>
+</article>
+<article  class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata mb-4">
+      <h4>Reviews:</h4>
+    </div>
+    {% for review in view.get_reviews %}
+    <div class="my-2 py-2">
+      <strong>👤 {{review.user.first_name}} {{review.user.last_name}}</strong>
+        ({% for i in review.rating|range %}⭐{% endfor %})
+      <br>
+      <p class="article-content py-1 pl-3"> ❝ {{review.description }} ❞</p>
+    </div>
+    {% endfor %}
+  </div>
+</article>
 {% endblock content %}
