@@ -41,4 +41,26 @@ class Delivery(models.Model):
     deliverd = models.BooleanField(default =False)
 
     def __str__(self):
-        return "Deliver '" + self.book.title +"' to " + self.user.username + " in " + self.area.name
+        return self.book.title +"' to " + self.user.username
+
+
+class OccupiedBook(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    date_borrowed = models.DateField()
+    date_returned = models.DateField(blank=True, null=True)
+    comments = models.CharField(blank=True, null=True, max_length=100)
+
+    def __str__(self):
+        return self.user.username + " - " +self.book.title
+
+    def save(self, *args, **kawrgs):
+        if self._state.adding:
+           self.book.available_copies = self.book.available_copies - 1
+           self.book.save()
+        else:
+           if self.date_returned:
+               self.book.available_copies = self.book.available_copies + 1
+               self.book.save()
+
+        super().save(*args, **kawrgs)

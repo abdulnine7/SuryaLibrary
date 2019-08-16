@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import (
     ListView,
     DetailView,
@@ -6,6 +6,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Book, Delivery, Review
 from .forms import OrderBookForm
@@ -33,16 +34,22 @@ class BookDetailView(DetailView):
 def about(request):
     return render(request, 'library/about.html', {'title': 'About'})
 
+@login_required
 def orderBook(request):
     if (request.method == 'GET'):
         form = OrderBookForm(request.GET)
+
+        #if user area is not set
+        if not request.user.profile.area:
+            messages.warning(request, 'You need to set your area first!')
+            return redirect('profile')
+
         if form.is_valid():
             book_id = form.cleaned_data['book_id']
             #Received booking request with book id now first check if available_copies
             book = get_object_or_404(Book, id = book_id)
             delivery = request.user.profile.area.day
 
-            #print("##" + delivery + "##" + book.title)
             if book.available_copies > 0: #means available
                 context = {
                     'book' : book,
