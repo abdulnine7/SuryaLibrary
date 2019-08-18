@@ -24,7 +24,7 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(choices=STAR)
     description = models.TextField(null=True, blank=True)
-    admin_confirmed = models.BooleanField()
+    admin_confirmed = models.BooleanField(default=False)
 
     def __str__(self):
         text = self.book.title + " ( "
@@ -38,7 +38,7 @@ class Delivery(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
     message = models.CharField(max_length=200, default="NO REMARKS")
-    deliverd = models.BooleanField(default =False)
+    delivered = models.BooleanField(default =False)
 
     def __str__(self):
         return self.book.title +"' to " + self.user.username

@@ -9,13 +9,7 @@ from django.views.generic import (
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Book, Delivery, Review
-from .forms import OrderBookForm
-
-def home(request):
-    context = {
-        'books': Book.objects.all()
-    }
-    return render(request, 'library/home.html', context)
+from .forms import OrderBookForm, CreateReviewForm
 
 class BookListView(ListView):
     model = Book
@@ -29,19 +23,53 @@ class BookDetailView(DetailView):
 
     def get_reviews(self):
         book = get_object_or_404(Book, id=self.kwargs.get('pk'))
-        return Review.objects.filter(book = book)
+        return Review.objects.filter(book = book).filter(admin_confirmed=True)
+
+    def get_review_form(self):
+        form = CreateReviewForm(initial = {'book': get_object_or_404(Book, id=self.kwargs.get('pk'))})
+        form.fields['book'].widget.attrs['hidden'] = True
+        form.fields['book'].label = ""
+        return form
 
 def about(request):
     return render(request, 'library/about.html', {'title': 'About'})
+
+@login_required
+def addReview(request):
+
+    if (request.method == 'POST'):
+        form = CreateReviewForm(request.POST)
+        if form.is_valid():
+            book = form.cleaned_data['book']
+            rating = form.cleaned_data['rating']
+            description = form.cleaned_data['description']
+            user = request.user
+
+            if not user.profile.admin_approved:
+                messages.info(request, 'Sorry admin need to aproves your profile to order books and post reviews.')
+                return redirect('book-detail', pk=book.id)
+
+            review = Review.objects.create(book=book,user=user,rating=rating,description=description)
+            review.save()
+            messages.info(request, 'Thank you for your valuble review. It will be visible on site once admin aproves it.')
+            return redirect('book-detail', pk=book.id)
+        else:
+            messages.info(request, 'Something is wrong. Please try again later')
+            return redirect('library-home')
 
 @login_required
 def orderBook(request):
     if (request.method == 'GET'):
         form = OrderBookForm(request.GET)
 
+        #if user profile is not approved
+        if not request.user.profile.admin_approved:
+            messages.info(request, 'Your profile need to be approves by admin to order books. Please contact admin.')
+            return redirect('library-home')
+
         #if user area is not set
         if not request.user.profile.area:
-            messages.warning(request, 'You need to set your area first!')
+            messages.info(request, 'You need to set your area first!')
             return redirect('profile')
 
         if form.is_valid():
