@@ -40,3 +40,6 @@ admin.site.register(Book, BookAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Delivery, DeliveryAdmin)
 admin.site.register(OccupiedBook, OccupiedBookAdmin)
+admin.site.site_header = "Surya Library Admin"
+admin.site.site_title = "Surya Library Admin"
+admin.site.site_url = None
